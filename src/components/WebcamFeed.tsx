@@ -13,6 +13,7 @@ import {
   computeMetrics,
   createDetector,
   smoothMetrics,
+  type Backend,
   type PostureMetrics,
   type PostureReading,
 } from "../lib/poseDetector";
@@ -27,6 +28,7 @@ interface Props {
   active: boolean;
   onReading: (reading: PostureReading) => void;
   onStatusChange: (status: CameraStatus, detail?: string) => void;
+  onBackend: (backend: Backend | null) => void;
 }
 
 export function WebcamFeed({
@@ -35,6 +37,7 @@ export function WebcamFeed({
   active,
   onReading,
   onStatusChange,
+  onBackend,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
@@ -123,14 +126,27 @@ export function WebcamFeed({
           height: video.videoHeight || 480,
         });
 
-        detectorRef.current = await createDetector();
-        if (cancelled) return;
+        const { detector, backend } = await createDetector();
+        if (cancelled) {
+          detector.dispose();
+          return;
+        }
+        detectorRef.current = detector;
+        onBackend(backend);
 
         onStatusChange("running");
         rafRef.current = requestAnimationFrame(() => void detect());
       } catch (error) {
         if (cancelled) return;
         const err = error as DOMException;
+
+        // Release the camera. Otherwise the feed keeps streaming behind an error
+        // message, the indicator light stays on, and the UI contradicts itself.
+        stream?.getTracks().forEach((track) => track.stop());
+        stream = null;
+        if (videoRef.current) videoRef.current.srcObject = null;
+        onBackend(null);
+
         if (err?.name === "NotAllowedError" || err?.name === "SecurityError") {
           onStatusChange("denied", "Camera permission was denied.");
         } else {
@@ -149,8 +165,9 @@ export function WebcamFeed({
       detectorRef.current?.dispose();
       detectorRef.current = null;
       historyRef.current = [];
+      onBackend(null);
     };
-  }, [active, detect, onStatusChange]);
+  }, [active, detect, onStatusChange, onBackend]);
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-900">

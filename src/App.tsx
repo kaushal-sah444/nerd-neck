@@ -17,7 +17,7 @@ import {
   saveThresholds,
   type PostureThresholds,
 } from "./lib/config";
-import type { PostureReading } from "./lib/poseDetector";
+import type { Backend, PostureReading } from "./lib/poseDetector";
 import {
   createSession,
   pointsFor,
@@ -51,6 +51,7 @@ export default function App() {
   const [statusDetail, setStatusDetail] = useState<string>();
   const [roast, setRoast] = useState<RoastMessage | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [backend, setBackend] = useState<Backend | null>(null);
 
   const readingRef = useRef<PostureReading>({
     state: "unknown",
@@ -70,7 +71,11 @@ export default function App() {
   const handleStatus = useCallback((next: CameraStatus, detail?: string) => {
     setStatus(next);
     setStatusDetail(detail);
+    // A failed start leaves the toggle stuck reading "Stop" over a dead camera.
+    if (next === "denied" || next === "error") setActive(false);
   }, []);
+
+  const handleBackend = useCallback((next: Backend | null) => setBackend(next), []);
 
   // The scoring clock. One interval, driven by measured elapsed time.
   useEffect(() => {
@@ -202,15 +207,39 @@ export default function App() {
           </div>
         </header>
 
-        <p className="mb-4 text-sm text-slate-400">
-          {STATUS_COPY[status]}
-          {statusDetail && status !== "denied" ? ` — ${statusDetail}` : ""}
-          {provider === "none" && (
-            <span className="ml-2 text-slate-500">
-              (roasts from the built-in list — set an API key for fresh ones)
-            </span>
-          )}
-        </p>
+        {status === "error" || status === "denied" ? (
+          <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm">
+            <p className="font-semibold text-amber-200">
+              {status === "denied" ? "Camera blocked" : "Could not start pose detection"}
+            </p>
+            <p className="mt-1 text-amber-100/80">{statusDetail}</p>
+            {status === "error" && (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-100/70">
+                <li>
+                  Turn on hardware acceleration (Chrome: Settings → System) and
+                  restart the browser.
+                </li>
+                <li>Check that WebGL works at <code>chrome://gpu</code>.</li>
+                <li>Or try another browser — Firefox and Edge fall back differently.</li>
+              </ul>
+            )}
+          </div>
+        ) : (
+          <p className="mb-4 text-sm text-slate-400">
+            {STATUS_COPY[status]}
+            {backend && (
+              <span className="ml-2 text-slate-500">
+                on {backend.toUpperCase()}
+                {backend === "cpu" && " — no WebGL, so this will be slow"}
+              </span>
+            )}
+            {provider === "none" && (
+              <span className="ml-2 text-slate-500">
+                (roasts from the built-in list — set an API key for fresh ones)
+              </span>
+            )}
+          </p>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-3">
@@ -220,6 +249,7 @@ export default function App() {
               active={active}
               onReading={handleReading}
               onStatusChange={handleStatus}
+              onBackend={handleBackend}
             />
             <button
               type="button"

@@ -58,25 +58,69 @@ const REQUIRED_KEYPOINTS = [
   "right_ear",
 ] as const;
 
-export async function createDetector(): Promise<poseDetection.PoseDetector> {
+/** Which compute backend TensorFlow ended up using. */
+export type Backend = "webgl" | "cpu";
+
+export interface Detector {
+  detector: poseDetection.PoseDetector;
+  backend: Backend;
+}
+
+/**
+ * Bring up a backend, in order of preference.
+ *
+ * `setBackend` **returns `false`** when a backend cannot initialise — it does not
+ * throw — so the result has to be checked. Getting that wrong means the fallback
+ * silently never runs and `tf.ready()` fails later with the unhelpful "all backend
+ * initializations failed".
+ *
+ * WebGL is tried first because it is roughly an order of magnitude faster. It is
+ * genuinely unavailable on plenty of real machines (hardware acceleration turned
+ * off, a blocklisted GPU driver, a locked-down VM), so CPU has to be a real
+ * fallback and not a theoretical one.
+ */
+async function selectBackend(
+  tf: typeof import("@tensorflow/tfjs-core"),
+): Promise<Backend> {
+  const candidates: Backend[] = ["webgl", "cpu"];
+  const failures: string[] = [];
+
+  for (const name of candidates) {
+    try {
+      if (await tf.setBackend(name)) {
+        await tf.ready();
+        return name;
+      }
+      failures.push(`${name}: unavailable`);
+    } catch (error) {
+      failures.push(`${name}: ${(error as Error).message}`);
+    }
+  }
+
+  throw new Error(
+    `No usable TensorFlow backend (${failures.join("; ")}). ` +
+      "Enable hardware acceleration in your browser settings, or try another browser.",
+  );
+}
+
+export async function createDetector(): Promise<Detector> {
   const [tf, detection] = await Promise.all([
     import("@tensorflow/tfjs-core"),
     import("@tensorflow-models/pose-detection"),
+    // Side-effect imports: each one registers itself with tfjs-core. The CPU
+    // backend is what makes the fallback above actually possible.
     import("@tensorflow/tfjs-backend-webgl"),
+    import("@tensorflow/tfjs-backend-cpu"),
   ]);
 
-  // WebGL keeps inference off the main thread's CPU budget. If the browser has no
-  // WebGL, tfjs falls back to CPU on its own — slower, but it still runs.
-  try {
-    await tf.setBackend("webgl");
-  } catch {
-    await tf.setBackend("cpu");
-  }
-  await tf.ready();
+  const backend = await selectBackend(tf);
 
-  return detection.createDetector(detection.SupportedModels.MoveNet, {
-    modelType: detection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-  });
+  const detector = await detection.createDetector(
+    detection.SupportedModels.MoveNet,
+    { modelType: detection.movenet.modelType.SINGLEPOSE_LIGHTNING },
+  );
+
+  return { detector, backend };
 }
 
 function midpoint(a: poseDetection.Keypoint, b: poseDetection.Keypoint) {
