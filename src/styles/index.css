@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+/* The roast toast is centred with -translate-x-1/2, so its keyframes must carry
+   that translate too — otherwise it snaps left the moment the animation ends. */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+html {
+  color-scheme: dark;
+}
