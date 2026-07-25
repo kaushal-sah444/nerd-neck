@@ -3,14 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nerd Neck — fix your tech neck</title>
     <meta
       name="description"
-      content="Webcam posture tracker that gamifies fixing tech neck. Runs entirely in your browser - video never leaves the device."
+      content="Webcam posture tracker that gamifies fixing tech neck with streaks, points and AI roasts. Runs entirely in your browser — video never leaves your device."
     />
-    <title>Nerd Neck — fix your tech neck</title>
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#020617" />
+
+    <!-- Link previews on social and chat apps. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Nerd Neck — fix your tech neck" />
+    <meta
+      property="og:description"
+      content="Points for sitting up, streaks for keeping it up, and an AI roast when you slump. 100% in-browser — the video never leaves your device."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <!--
+      The camera is the whole app, so state the privacy position where a
+      permission-shy visitor will actually see it: the page itself (see App.tsx),
+      the README, and here in the source.
+      Pose detection runs client-side via WebGL. No frame is ever uploaded.
+    -->
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      Nerd Neck needs JavaScript: pose detection runs in your browser so that no
+      video ever leaves your device.
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

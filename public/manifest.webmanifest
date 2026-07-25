@@ -1,0 +1,19 @@
+{
+  "name": "Nerd Neck — posture tracker",
+  "short_name": "Nerd Neck",
+  "description": "Webcam posture tracker that gamifies fixing tech neck with streaks, points and AI roasts. Runs entirely in your browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

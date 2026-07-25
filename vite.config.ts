@@ -4,6 +4,10 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  // Relative asset paths, so the same build works at a domain root, in a
+  // /repo-name/ subpath on GitHub Pages, or opened from the filesystem. Safe
+  // here because the app is a single page with no client-side router.
+  base: "./",
   plugins: [react(), tailwindcss()],
   server: {
     // getUserMedia requires a secure context. localhost counts as secure, so
