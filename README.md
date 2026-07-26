@@ -27,7 +27,7 @@ on an insecure origin.
 Works with no API key at all — roasts come from a built-in list of 20 until you
 add one.
 
-## How it works
+## How it work
 
 Every 100 ms (configurable) a frame goes to **MoveNet** via TensorFlow.js, which
 returns 17 body keypoints. Four of them — both shoulders, both ears — are reduced
