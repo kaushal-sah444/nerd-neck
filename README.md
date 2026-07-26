@@ -13,7 +13,7 @@ A webcam posture tracker that gamifies fixing **tech neck** — points for sitti
 up, streaks for keeping it up, and an AI-generated roast when you slump.
 
 Pose detection runs in your browser on WebGL. **No video, no images and no
-keypoints ever leave your device.**
+keypoints ever leave your device.
 
 ```bash
 npm install
