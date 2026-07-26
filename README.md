@@ -4,10 +4,10 @@
 [![React 18](https://img.shields.io/badge/react-18-149eca.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/typescript-strict-3178c6.svg)](https://www.typescriptlang.org/)
 [![Tests](https://img.shields.io/badge/tests-30-brightgreen.svg)](#tests)
-[![Live](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://kaushal-sah444.github.io/nerd-neck/)
+[![Live](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://beausome.github.io/nerd-neck/)
 [![Privacy](https://img.shields.io/badge/video-never%20leaves%20your%20device-brightgreen.svg)](#privacy)
 
-### ▶︎ [Try it live](https://kaushal-sah444.github.io/nerd-neck/)
+### ▶︎ [Try it live](https://beausome.github.io/nerd-neck/)
 
 A webcam posture tracker that gamifies fixing **tech neck** — points for sitting
 up, streaks for keeping it up, and an AI-generated roast when you slump.
@@ -20,7 +20,7 @@ npm install
 npm run dev      # then open http://localhost:5173 and allow the camera
 ```
 
-Or just open the [hosted version](https://kaushal-sah444.github.io/nerd-neck/) —
+Or just open the [hosted version](https://beausome.github.io/nerd-neck/) —
 nothing to install. It is served over HTTPS because the camera API refuses to run
 on an insecure origin.
 
