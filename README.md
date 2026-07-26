@@ -95,7 +95,7 @@ See [.env.example](.env.example).
   actually goes out.
 - The only outbound request the app can ever make is the roast call, and it
   carries two integers.
-- There is no analytics, no telemetry and no backend.
+- There is no analytics, no telemetry and no backend
 
 ## Tests
 
